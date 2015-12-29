@@ -14,7 +14,7 @@ import org.gearman.GearmanServer;
  * The echo example illustrates how send a single job and get the result
  */
 public class EchoClientAsynchronous implements GearmanJobEventCallback<String> {
-
+ 
         public static void main(String... args) throws InterruptedException {
 
                 /*

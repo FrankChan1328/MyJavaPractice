@@ -16,54 +16,31 @@ public class EchoClient {
 
         public static void main(String... args) throws InterruptedException {
 
-                /*
-                 * Create a Gearman instance
-                 */
                 Gearman gearman = Gearman.createGearman();
 
-                /*
-                 * Create a new gearman client.
-                 * 
-                 * The client is used to submit requests the job server.
-                 */
+                // 创建一个 Gearman client
+                // 用来向 job server 提交请求
                 GearmanClient client = gearman.createGearmanClient();
 
-                /*
-                 * Create the job server object. This call creates an object represents
-                 * a remote job server.
-                 * 
-                 * Parameter 1: the host address of the job server.
-                 * Parameter 2: the port number the job server is listening on.
-                 * 
-                 * A job server receives jobs from clients and distributes them to
-                 * registered workers.
-                 */
+                // 创建一个 job server 对象，该对象代表 remote job server.
+                // job server 从clients 得到jobs 然后分发给注册workers
                 GearmanServer server = gearman.createGearmanServer(
                                 EchoWorker.ECHO_HOST, EchoWorker.ECHO_PORT);
 
-                /*
-                 * Tell the client that it may connect to this server when submitting
-                 * jobs.
-                 */
+                // client 连接server
                 client.addServer(server);
 
-                /*
-                 * Submit a job to a job server.
-                 * 
-                 * Parameter 1: the gearman function name
-                 * Parameter 2: the data passed to the server and worker
-                 * 
-                 * The GearmanJobReturn is used to poll the job's result
-                 */
+                // 将 job submit 给server
+                // 参数1：function 名称
+                // 参数2：将要传给server 和 worker 的数据
+                // GearmanJobReturn 用来取得 job 的结果
                 GearmanJobReturn jobReturn = client.submitJob(
                                 EchoWorker.ECHO_FUNCTION_NAME, ("Hello World").getBytes());
 
-                /*
-                 * Iterate through the job events until we hit the end-of-file
-                 */
+                // 遍历job 事件，直到文件末尾
                 while (!jobReturn.isEOF()) {
 
-                        // Poll the next job event (blocking operation)
+                		// 获得下个job，(阻塞操作)
                         GearmanJobEvent event = jobReturn.poll();
 
                         switch (event.getEventType()) {

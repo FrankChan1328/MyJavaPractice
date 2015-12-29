@@ -16,54 +16,33 @@ import org.gearman.GearmanWorker;
  * echo worker 说明了如何创建 basic worker
  */
 public class EchoWorkerServer {
-        public static void main(String... args) throws IOException {
+	public static void main(String... args) throws IOException {
 
-                /*
-                 * Create a Gearman instance
-                 */
-                Gearman gearman = Gearman.createGearman();
+		// 创建一个Gearman 实例
+		Gearman gearman = Gearman.createGearman();
 
-                try {
+		try {
 
-                        /*
-                         * Start a new job server. The resulting server will be running in
-                         * the local address space.
-                         * 
-                         * Parameter 1: The port number to listen on
-                         * 
-                         * throws IOException
-                         */
-                		// 启动一个新的 job server.
-                        GearmanServer server = gearman
-                                        .startGearmanServer(EchoWorker.ECHO_PORT);
+			// 启动一个新的 job server.
+			// 在本机启动
+			// 参数为监听端口
+			GearmanServer server = gearman.startGearmanServer(EchoWorker.ECHO_PORT);
 
-                        /*
-                         * Create a gearman worker. The worker poll jobs from the server and
-                         * executes the corresponding GearmanFunction
-                         */
-                        // 创建一个 gearman worker.
-                        // worker 
-                        GearmanWorker worker = gearman.createGearmanWorker();
+			// 创建一个 gearman worker.
+			// 从server 拉任务，然后执行相应的 GearmanFunction
+			GearmanWorker worker = gearman.createGearmanWorker();
 
-                        /*
-                         *  Tell the worker how to perform the echo function
-                         */
-                        worker.addFunction(EchoWorker.ECHO_FUNCTION_NAME, new EchoWorker());
+			// 告诉worker 如何执行工作(主要实现了 GearmanFunction 接口)
+			worker.addFunction(EchoWorker.ECHO_FUNCTION_NAME, new EchoWorker());
 
-                        /*
-                         *  Tell the worker that it may communicate with the given job server
-                         */
-                        worker.addServer(server);
+			// worker 连接服务器
+			worker.addServer(server);
 
-                } catch (IOException ioe) {
+		} catch (IOException ioe) {
+			// 出现错误，关闭 gearman service
+			gearman.shutdown();
 
-                        /*
-                         * If an exception occurs, make sure the gearman service is shutdown
-                         */
-                        gearman.shutdown();
-
-                        // forward exception
-                        throw ioe;
-                }
-        }
+			throw ioe;
+		}
+	}
 }
